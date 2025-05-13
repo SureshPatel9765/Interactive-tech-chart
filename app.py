@@ -8,7 +8,7 @@ st.set_page_config(layout="wide")
 st.title("Live-like OHLC Chart")
 
 # 1. Dropdown for ticker selection
-stock_list = ['NSE:RELIANCE', 'NSE:TCS', 'NSE:INFY']  # Add your preferred tickers
+stock_list = ['NSE:TCS', 'NSE:INFY', 'NSE:RELIANCE','NSE:FORCEMOT']  # Add your preferred tickers
 selected_stock = st.selectbox("Choose a Stock", stock_list)
 
 # 2. Trigger Apps Script URL to update ticker in Data sheet
