@@ -4,7 +4,6 @@ import plotly.graph_objects as go
 import requests
 import time
 
-st.plotly(fig).close()
 st.set_page_config(layout="wide")
 st.title("Live-like OHLC Chart")
 
@@ -43,5 +42,6 @@ if 'Date' in df.columns:
 
     fig.update_layout(xaxis_rangeslider_visible=False, height=600)
     st.plotly_chart(fig, use_container_width=True)
+    fig.close()
 else:
     st.warning("Data not available. Please wait a few seconds and click 'Update Chart' again.")
