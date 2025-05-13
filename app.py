@@ -4,6 +4,7 @@ import plotly.graph_objects as go
 import requests
 import time
 
+st.plotly(fig).close()
 st.set_page_config(layout="wide")
 st.title("Live-like OHLC Chart")
 
