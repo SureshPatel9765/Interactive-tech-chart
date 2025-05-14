@@ -10,15 +10,16 @@ st.title("Live-like OHLC Chart")
 # 1. Dropdown for ticker selection
 stock_list = ['NSE:TCS', 'NSE:INFY', 'NSE:RELIANCE','NSE:FORCEMOT']  # Add your preferred tickers
 selected_stock = st.selectbox("Choose a Stock", stock_list)
-
+script_url=" "
+selected_stock=" "
+fig=" "
 # 2. Trigger Apps Script URL to update ticker in Data sheet
 if st.button("Update Chart"):
     script_url = "https://script.google.com/macros/s/AKfycbw57Bx__2re0AnMBkBL8u0_8mITISgxy138cqijEZP5NwyhorPefJk-ajruRPtCj3UkhQ/exec"
     response = requests.get(f"{script_url}?stock={selected_stock}")
     if response.status_code == 200:
         st.success(f"Updated to {selected_stock}")
-        script_url=" "
-        selected_stock=" "
+        
         time.sleep(15)  # Wait to allow GoogleFinance to update data
     else:
         st.error("Failed to update ticker")
