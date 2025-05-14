@@ -4,9 +4,6 @@ import plotly.graph_objects as go
 import requests
 import time
 
-script_url=" "
-selected_stock=" "
-fig=" "
 st.set_page_config(layout="wide")
 st.title("Live-like OHLC Chart")
 
@@ -21,7 +18,7 @@ if st.button("Update Chart"):
     if response.status_code == 200:
         st.success(f"Updated to {selected_stock}")
         
-        time.sleep(15)  # Wait to allow GoogleFinance to update data
+        time.sleep(10)  # Wait to allow GoogleFinance to update data
     else:
         st.error("Failed to update ticker")
 
@@ -46,6 +43,6 @@ if 'Date' in df.columns:
 
     fig.update_layout(xaxis_rangeslider_visible=False, height=600)
     st.plotly_chart(fig, use_container_width=True)
-    df=" "
+    
 else:
     st.warning("Data not available. Please wait a few seconds and click 'Update Chart' again.")
