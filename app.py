@@ -4,15 +4,16 @@ import plotly.graph_objects as go
 import requests
 import time
 
+script_url=" "
+selected_stock=" "
+fig=" "
 st.set_page_config(layout="wide")
 st.title("Live-like OHLC Chart")
 
 # 1. Dropdown for ticker selection
 stock_list = ['NSE:TCS', 'NSE:INFY', 'NSE:RELIANCE','NSE:FORCEMOT']  # Add your preferred tickers
 selected_stock = st.selectbox("Choose a Stock", stock_list)
-script_url=" "
-selected_stock=" "
-fig=" "
+
 # 2. Trigger Apps Script URL to update ticker in Data sheet
 if st.button("Update Chart"):
     script_url = "https://script.google.com/macros/s/AKfycbw57Bx__2re0AnMBkBL8u0_8mITISgxy138cqijEZP5NwyhorPefJk-ajruRPtCj3UkhQ/exec"
