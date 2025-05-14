@@ -17,6 +17,8 @@ if st.button("Update Chart"):
     response = requests.get(f"{script_url}?stock={selected_stock}")
     if response.status_code == 200:
         st.success(f"Updated to {selected_stock}")
+        script_url=" "
+        selected_stock=" "
         time.sleep(15)  # Wait to allow GoogleFinance to update data
     else:
         st.error("Failed to update ticker")
@@ -42,6 +44,6 @@ if 'Date' in df.columns:
 
     fig.update_layout(xaxis_rangeslider_visible=False, height=600)
     st.plotly_chart(fig, use_container_width=True)
-    selected_stock=""
+    df=" "
 else:
     st.warning("Data not available. Please wait a few seconds and click 'Update Chart' again.")
