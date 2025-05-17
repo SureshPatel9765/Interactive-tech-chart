@@ -4,4 +4,4 @@ plotly
 requests
 time
 gspread
-ServiceAccountCredentials
+google-auth
