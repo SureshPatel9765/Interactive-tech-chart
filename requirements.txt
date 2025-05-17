@@ -1,7 +1,5 @@
-pandas
-numpy
-plotly
-requests
-time
+streamlit
 gspread
 google-auth
+pandas
+requests
