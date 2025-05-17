@@ -1,52 +1,42 @@
 import streamlit as st
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
 import pandas as pd
-import plotly.graph_objects as go
 import time
 import requests
 
-st.set_page_config(layout="wide")
-st.title("Live-like OHLC Chart")
+# === Setup Google Sheets access ===
+"scope = [""https://spreadsheets.google.com/feeds"", ""https://www.googleapis.com/auth/drive""]"
+"creds = ServiceAccountCredentials.from_json_keyfile_name(""credentials.json"", scope)"
+client = gspread.authorize(creds)
 
-# Dropdown to select ticker
-tickers = ["NSE:RELIANCE", "NSE:TCS", "NSE:HDFCBANK", "NSE:INFY"]
-ticker = st.selectbox("Select Ticker", tickers)
+# Open your sheet
+"sheet = client.open(""Monthly or weekly  Technical Analysis Scanner"")"
+"#control_sheet = sheet.worksheet(""Control"")"
+"data_sheet = sheet.worksheet(""Data"")"
 
-# Step 1: Update Google Sheet via Apps Script
-update_url = f"https://script.google.com/macros/s/AKfycbw57Bx__2re0AnMBkBL8u0_8mITISgxy138cqijEZP5NwyhorPefJk-ajruRPtCj3UkhQ/exec?stock={ticker}"
-st.text(f"Updating Google Sheet for {ticker}...")
-requests.get(update_url)
+# === Ticker dropdown ===
+"tickers = [""INFY"", ""TCS"", ""RELIANCE"", ""HDFCBANK""]"
+"selected = st.selectbox(""Select a Stock"", tickers)"
 
-# Step 2: Wait for Google Sheets to refresh
-csv_url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTFH0Am4UhvY6KaiFZEw5QhAP17wUog-QwhFY70h5SCUEsA2ZX6ccfNZlvf3sNV-KF9dlbjdP_6xt51/pub?gid=1177240346&single=true&output=csv"
+"if st.button(""Update Ticker""):"
+"data_sheet.update(""A1"", selected)"
 
-max_retries = 10
-for i in range(max_retries):
-    try:
-        df = pd.read_csv(csv_url)
-        if "Date" in df.columns and len(df) > 3:
-            break
-    except:
-        pass
-    st.text("Waiting for data update...")
-    time.sleep(1)
+# Call your Apps Script web app to update Data!A1 formula
+"apps_script_url = ""https://script.google.com/macros/s/AKfycbzBHt2lsU4N-6_Fx976L5oOq-pO7vSvxoPDaVN8z_yLVgsfdqqWUAoB-MyAConY-zl3_A/exec"""
+try:
+response = requests.get(apps_script_url)
+if response.status_code == 200:
+"st.success(f""Updated to {selected}. Loading live data..."")"
+time.sleep(3)  # wait for GOOGLEFINANCE to fetch data
 else:
-    st.error("Data not updated. Try again.")
-    st.stop()
+"st.error(""Apps Script error"")"
+except Exception as e:
+"st.error(f""Request failed: {e}"")"
 
-# Step 3: Prepare and show chart
-df = df.sort_values('Date')
-df['Date'] = pd.to_datetime(df['Date'])
-
-window = st.slider("Number of recent candles", min_value=10, max_value=len(df), value=50)
-sub_df = df.tail(window)
-
-fig = go.Figure(data=[go.Candlestick(
-    x=sub_df['Date'],
-    open=sub_df['Open'],
-    high=sub_df['High'],
-    low=sub_df['Low'],
-    close=sub_df['Close']
-)])
-
-fig.update_layout(xaxis_rangeslider_visible=False, height=600)
-st.plotly_chart(fig, use_container_width=True)
+# === Fetch and display updated data ===
+data = data_sheet.get_all_records()
+if data:
+df = pd.DataFrame(data)
+"df[""Date""] = pd.to_datetime(df[""Date""])"
+"st.line_chart(df.set_index(""Date"")[""Close""])  # Adjust if column is named differently"
