@@ -4,37 +4,45 @@ from google.oauth2.service_account import Credentials
 import pandas as pd
 import time
 
-# 1) Setup Google Sheets client
-scope = ["https://www.googleapis.com/auth/spreadsheets","https://www.googleapis.com/auth/drive"]
-creds = Credentials.from_service_account_info(st.secrets["gcp_service_account"], scopes=scope)
+# — Setup Google Sheets client from Streamlit secrets —
+scopes = [
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/drive",
+]
+creds = Credentials.from_service_account_info(
+    st.secrets["gcp_service_account"],
+    scopes=scopes
+)
 client = gspread.authorize(creds)
 data_sheet = client.open("Monthly or weekly  Technical Analysis Scanner").worksheet("Data")
 
-# 2) Initialize session state
-if "df" not in st.session_state:
-    st.session_state.df = None
+# — Streamlit UI —
+st.title("Live Tech Chart")
 
-# 3) UI
-st.title("Live Tech Chart (Approach 2)")
-tickers = ["INFY","TCS","RELIANCE","HDFCBANK"]
+tickers = ["INFY", "TCS", "RELIANCE", "HDFCBANK"]
 selected = st.selectbox("Select a Stock", tickers)
 
 if st.button("Update & Plot"):
-    data_sheet.update("A1", selected)
-    st.write(f"✅ Updated ticker to **{selected}**, fetching new data…")
+    # 1) Build the GOOGLEFINANCE formula string
+    formula = (
+        f'=GOOGLEFINANCE("{selected}",'
+        '"all",TODAY()-250,TODAY())'
+    )
+    # 2) Write it into Data!A1 as a formula
+    data_sheet.update_acell("A1", formula)
+
+    st.write(f"✅ Updated Data!A1 with formula for **{selected}**. Fetching data…")
+    # 3) Wait for Sheets to recalc
     time.sleep(5)
 
-    data = data_sheet.get_all_records()
-    if data:
-        df = pd.DataFrame(data)
-        if {"Date","Close"}.issubset(df.columns):
+    # 4) Fetch the sheet’s records and plot
+    records = data_sheet.get_all_records()
+    if records:
+        df = pd.DataFrame(records)
+        if {"Date", "Close"}.issubset(df.columns):
             df["Date"] = pd.to_datetime(df["Date"])
-            st.session_state.df = df
+            st.line_chart(df.set_index("Date")["Close"])
         else:
-            st.error("Required columns missing.")
+            st.error("Required columns (‘Date’ & ‘Close’) not found in the sheet.")
     else:
-        st.error("No data returned.")
-
-# 4) Always render chart if available
-if st.session_state.df is not None:
-    st.line_chart(st.session_state.df.set_index("Date")["Close"])
+        st.error("No data returned. Please wait a moment and try again.")
