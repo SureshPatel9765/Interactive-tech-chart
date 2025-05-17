@@ -7,7 +7,7 @@ import requests
 
 # === Setup Google Sheets access ===
 scope = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
-creds = Credentials.from_service_account_file(st.secrets["gcp_service_account"], scopes=scope)
+creds = Credentials.from_service_account_file(st.secrets["gcp_service_account"]["Secrets"], scopes=scope)
 client = gspread.authorize(creds)
 
 # Open your sheet
