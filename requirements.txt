@@ -3,3 +3,5 @@ numpy
 plotly
 requests
 time
+gspread
+ServiceAccountCredentials
