@@ -25,7 +25,7 @@ selected = st.selectbox("Select a Stock", tickers)
 if st.button("Update & Plot"):
     # 1) Build the GOOGLEFINANCE formula string
     formula = (
-        f'=GOOGLEFINANCE("{selected}",'
+        f'=GOOGLEFINANCE("NSE:{selected}",'
         '"all",TODAY()-250,TODAY())'
     )
     # 2) Write it into Data!A1 as a formula
