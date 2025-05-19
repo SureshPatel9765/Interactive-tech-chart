@@ -1,5 +1,6 @@
 streamlit
 streamlit-searchbox
+plotly
 gspread
 google-auth
 pandas
